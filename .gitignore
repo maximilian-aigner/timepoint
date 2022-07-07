@@ -2,3 +2,7 @@
 .Rbuildignore
 .DS_Store
 .Rproj.user/
+timepoint.Rproj
+outline.bike
+*.o
+*.so
