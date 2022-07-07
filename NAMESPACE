@@ -1,0 +1,4 @@
+useDynLib(timepoint, .registration=TRUE)
+importFrom(Rcpp, evalCpp)
+import(lubridate)
+exportPattern("^[[:alpha:]]+")
