@@ -1,4 +1,4 @@
-library(lubridate)
+#library(lubridate)
 
 # start <- lubridate::ymd_hms("2022-01-01 00:00:00")
 # end <- lubridate::ymd_hms("2022-01-01 23:59:59")
@@ -8,10 +8,6 @@ el <- eventlist(datetimes = events,
                 values = genders,
                 bounds = ymd_hms("2022-01-01 00:00:00", "2022-01-01 23:59:59"),
                 units = "secs")
-
-test_that("multiplication works", {
-  expect_equal(2 * 2, 4)
-})
 
 test_that("num_makes_sense", {
   # should internally store time as hours
