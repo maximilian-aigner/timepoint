@@ -1,10 +1,17 @@
 # Constructor
 new_eventlist_from_dt <- function(datetimes, values = NULL,
-                                  bounds, units = "auto") {
+                                  bounds = NULL, units = "auto") {
   if (!is.null(values)) {
     stopifnot(length(datetimes) == length(values)) 
   }
-  stopifnot(length(bounds) != 2 | is.POSIXt(bounds))
+  if (!is.null(bounds))
+  {
+    stopifnot(length(bounds) != 2 | is.POSIXt(bounds))
+  } else {
+    warning("No bounds provided, using data range")
+    bounds <- range(datetimes)
+  }
+  
   
   stopifnot(is.POSIXt(datetimes))
   dts <- difftime(time1 = datetimes,
@@ -29,20 +36,20 @@ new_eventlist_from_dt <- function(datetimes, values = NULL,
 
 # Helper constructor
 eventlist <- function(datetimes, values = NULL,
-                      bounds, units = "auto") {
+                      bounds = NULL, units = "auto") {
   # TODO: Implement creation from other types? File descriptors?
   new_eventlist_from_dt(datetimes, values, bounds, units)
 }
 
-summary.eventlist <- function(el, ...) {
+summary.eventlist <- function(object, ...) {
   cat("Event list spanning ")
-  cat(as.character(el$bounds[1]))
+  cat(as.character(object$bounds[1]))
   cat(" -- ")
-  cat(as.character(el$bounds[2]))
+  cat(as.character(object$bounds[2]))
   cat(" with ")
-  cat(length(el$datetimes))
+  cat(length(object$datetimes))
   cat(" events")
-  if (el$marked) {
+  if (object$marked) {
     cat(", marked")
   }
 }
