@@ -1,13 +1,14 @@
 Package: timepoint
 Type: Package
 Title: Temporal Event Modeling Using Point Processes
-Version: 0.1
+Version: 0.0.1
+Depends: R (>= 3.5.0)
 Date: 2022-06-10
 Author: Maximilian Aigner
 Maintainer: Maximilian Aigner <maximilian.aigner@unil.ch>
 Description: Offers models and utilities for event time data using point
       processes.
 License: MIT
-Imports: Rcpp (>= 1.0.7), lubridate (>= 1.8.0)
+Imports: Rcpp (>= 1.0.7), lubridate (>= 1.8.0), cubature (>= 2.0.0.0)
 LinkingTo: Rcpp
 Config/testthat/edition: 3
