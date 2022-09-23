@@ -24,21 +24,12 @@ presence_to_transitions <- function(data, times = NULL) {
     rl <- rle(one.series)
     origin <- c(NA, rl$values)
     transfer_time <- c(NA, cumsum(rl$lengths))
-    # start_times <- c(NA, cumsum(rl$lengths))
-    # end_times <- c(cumsum(rl$lengths), NA)
     destination <- c(rl$values, NA)
     id <- rep(ind.names[j], length(origin))
     return(cbind(id,origin,destination,transfer_time))
   })
   names(by.individual) <- ind.names
-  #if (length(by.individual) > 1) {
-    out <- as.data.frame(do.call("rbind", by.individual))
-  #} else {
-  #  out <- as.data.frame(by.individual, check.names = FALSE, optional = TRUE)
-  #}
-  #out <- ifelse(length(by.individual) > 1,
-  #              as.data.frame(do.call("rbind", by.individual)),
-  #              as.data.frame(by.individual))# dplyr::bind_rows(by.individual)
+  out <- as.data.frame(do.call("rbind", by.individual))
   if (!is.null(times)) {
     out$transfer_time <- times[out$transfer_time]
   }
