@@ -1,5 +1,6 @@
 \name{eventlist}
 \alias{eventlist}
+\alias{summary.eventlist}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Eventlist objects
@@ -9,6 +10,7 @@ An eventlist object represents a dataset of event times and (optionally) marks, 
 }
 \usage{
 eventlist(datetimes, values = NULL, bounds = NULL, units = "auto")
+\method{summary}{eventlist}(object, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -42,25 +44,16 @@ An object of time \code{eventlist}, with attributes:
 \item{\code{marked}}{Whether the eventlist contains values}
 
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
 \author{
-%%  ~~who you are~~
+Maximilian Aigner \email{maximilian.aigner@unil.ch}
 }
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
 \code{\link{summary.eventlist}}
-%% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
 data(bikes, package = "timepoint")
 eventlist(bikes$departure, bikes$origin,
-          bounds = ymd("2022-07-05", "2022-08-09", tz = "UTC"),
+          bounds = lubridate::ymd("2022-07-05", "2022-08-09", tz = "UTC"),
           units = "days")
 }
