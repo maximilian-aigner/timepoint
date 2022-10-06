@@ -1,0 +1,5 @@
+bibentry(bibtype = "Manual",
+         title = "timepoint: Temporal Event Modeling Using Point Processes",
+         author = person("Maximilian", "Aigner", role = "aut"),
+         year = 2022,
+         url = "https://github.com/maximilian-aigner/timepoint")
