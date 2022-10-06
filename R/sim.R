@@ -3,7 +3,7 @@ exp_kernel <- function(x, a = 1) {
   exp(-a*x)
 }
 
-sim.hop <- function(bounds = c(0, 100),
+sim_hop <- function(bounds = c(0, 100),
                            rate = 1) {
   number <- diff(bounds)*rate
   pts <- sort(runif(number, bounds[1], bounds[2]))
@@ -43,7 +43,8 @@ sim.hop <- function(bounds = c(0, 100),
   return(v)
 }
 
-sim.rsp <- function(intervention_points,
+
+sim_cluster_poisson <- function(intervention_points,
                          bounds = c(0, 10),
                          kernel = exp_kernel,
                          kernel_bound = NULL) {
@@ -55,7 +56,7 @@ sim.rsp <- function(intervention_points,
     prev <- intervention_points[intervention_points<x]
     if(length(prev)==0) return(0)
     v <- sapply(prev, \(u) kernel(x-u))
-    return(sum(v))#sum(sapply(latent_pts[latent_pts<x], \(u) kernel(x-u)))
+    return(sum(v))
   }
   pts <- .thinning.alg(lambda, ub = intens_upper_bound, bT = diff(bounds))
   pts <- bounds[1] + pts
@@ -63,23 +64,11 @@ sim.rsp <- function(intervention_points,
   return(list(intervention_points = intervention_points, observed = pts))
 }
 
-sim.dsp <- function(bounds = c(0, 10),
+sim_dsp <- function(bounds = c(0, 10),
                          rate = 1,
                          kernel = exp_kernel,
                          kernel_bound = NULL) {
-  latent_pts <- sim.hop(bounds, rate)
-  if (is.null(kernel_bound)) {
-    kernel_bound <- .kernel.bound(kernel, bounds)
-  }
-  intens_upper_bound <- 2.326 * rate + kernel_bound
-  lambda <- function(x) {
-    prev <- latent_pts[latent_pts<x]
-    if(length(prev)==0) return(0)
-    v <- sapply(prev, \(u) kernel(x-u))
-    return(sum(v))#sum(sapply(latent_pts[latent_pts<x], \(u) kernel(x-u)))
-  }
-  pts <- .thinning.alg(lambda, ub = intens_upper_bound, bT = diff(bounds))
-  pts <- bounds[1] + pts
-  pts <- pts[pts<bounds[2]]
-  return(list(latent = latent_pts, observed = pts))
+  latent_pts <- sim_hop(bounds, rate)
+  obs_pts <- sim_cluster_poisson(latent_pts, bounds = kernel, kernel_bound)
+  return(list(latent = latent_pts, observed = obs_pts))
 }
