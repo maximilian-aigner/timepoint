@@ -6,7 +6,7 @@ events <- lubridate::ymd_hms("2022-01-01 06:00:00", "2022-01-01 23:59:59")
 genders <- list(c(gender="male"), c(gender="female"))
 el <- eventlist(datetimes = events,
                 values = genders,
-                bounds = ymd_hms("2022-01-01 00:00:00", "2022-01-01 23:59:59"),
+                bounds = lubridate::ymd_hms("2022-01-01 00:00:00", "2022-01-01 23:59:59"),
                 units = "secs")
 
 test_that("num_makes_sense", {
