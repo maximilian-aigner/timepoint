@@ -30,6 +30,9 @@ eventlist(datetimes, values = NULL, bounds = NULL, units = "auto")
   If desired, a time unit may be specified here. Otherwise, a convenient choice is made (via \code{difftime}).
 %%     ~~Describe \code{units} here~~
 }
+  \item{...}{
+  Currently unused
+  }
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
