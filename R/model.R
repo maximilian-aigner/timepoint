@@ -31,8 +31,14 @@ tpmodel.fit.poisson <- function(eventlist, covariates, ilink) {
     lower <- -Inf
     upper <- Inf
   }
-  result <- stats::optim(th0, fn = \(x) -.lhood.unmarked.poisson(nt, bds, covariates, x), control = list(trace = 1),
-                  hessian = TRUE, method = method, lower = lower, upper = upper)
+  if (eventlist$marked) {
+    xs <- eventlist$values
+    ofun <- \(x) -.lhood.marked.poisson(nt, xs, bds, covariates, x)
+  } else {
+    ofun <- \(x)  -.lhood.unmarked.poisson(nt, bds, covariates, x)
+  }
+  result <- stats::optim(th0, fn = ofun, hessian = TRUE, method = method,
+                         lower = lower, upper = upper)
   
   # Result is good but on numeric scale,
   # i.e. it matches length(eventlist)/eventlist$num_bounds[2]
@@ -73,3 +79,5 @@ tpmodel.fit.poisson <- function(eventlist, covariates, ilink) {
   }, lowerLimit = bds[c(1,3)], upperLimit = bds[c(2,4)])$integral
   return(term1 - term2)
 }
+
+
