@@ -12,7 +12,6 @@ new_eventlist_from_dt <- function(datetimes, values = NULL,
     bounds <- range(datetimes)
   }
   
-  
   stopifnot(is.POSIXt(datetimes))
   dts <- difftime(time1 = datetimes,
                   time2 = rep(bounds[1], length(datetimes)),
@@ -20,13 +19,26 @@ new_eventlist_from_dt <- function(datetimes, values = NULL,
   
   units <- attr(dts, "units")
   
-  num_length <- difftime(bounds[2], bounds[1], units = units)
+  possible_units <- c("secs", "mins", "hours",
+                      "days", "weeks")
   
+  # Reduce numtimes for numerical stability (...)
+  while(any(as.numeric(dts) > 1000)) {
+    if (units != "weeks") { # Otherwise, cannot increase
+      new_units <- possible_units[which(units == possible_units) + 1]
+      units(dts) <- new_units
+      units <- new_units
+    } else {
+      break
+    }
+  }
+  
+  num_length <- difftime(bounds[2], bounds[1], units = units)
   
   structure(list(
     datetimes = datetimes,
     num_times = as.numeric(dts),
-    num_unit = attr(dts, "units"),
+    num_unit = units,
     bounds = bounds,
     num_bounds = c(0, as.numeric(num_length)),
     values = values,
