@@ -5,7 +5,7 @@ exp_kernel <- function(x, a = 1) {
 
 sim_hop <- function(bounds = c(0, 100),
                            rate = 1) {
-  number <- diff(bounds)*rate
+  number <- rpois(1, diff(bounds)*rate)
   pts <- sort(runif(number, bounds[1], bounds[2]))
   return(pts)
 }
@@ -69,6 +69,60 @@ sim_dsp <- function(bounds = c(0, 10),
                          kernel = exp_kernel,
                          kernel_bound = NULL) {
   latent_pts <- sim_hop(bounds, rate)
-  obs_pts <- sim_cluster_poisson(latent_pts, bounds = kernel, kernel_bound)
+  obs_pts <- sim_cluster_poisson(latent_pts, kernel = kernel, bounds = bounds, kernel_bound)
   return(list(latent = latent_pts, observed = obs_pts))
+}
+
+sim_ihop <- function(lambda, bounds) {
+  ub <- optimise(lambda, interval = bounds, maximum = TRUE)$maximum
+  .thinning.alg(lambda, ub, bounds[2], ap = FALSE)
+}
+
+sim_gw <- function(pts, rkernel) {
+  
+  generate_cluster = function(origin, max.generations = 100) {
+    cluster = vector("list", max.generations)
+    cluster[[1]] = list(times = origin, parents = 0)
+    
+    for (n in 1:max.generations) {
+      if (n == max.generations) warning("Hit max generations")
+      
+      new_parents <- c()
+      new_times <- c()
+      for (point in cluster[[n]]$times) {
+        # Lewis' thinning algorithm
+        s <- 0
+        ubound <- 3*rkernel(0)
+        offspring = c()
+        while(point + s < end) {
+          s = s + rexp(1, ubound)
+          d = runif(1)
+          if(d * ubound <= rkernel(s)) {
+            offspring = c(offspring, s)
+          }
+        }
+        new_parents <- c(new_parents, rep(point, length(offspring)))
+        new_times <- c(new_times, point + offspring)
+      }
+      if (length(new_times) == 0) # no new points, the cluster has died out
+        break
+      else {
+        cluster[[n+1]] = list(times = new_times,
+                              parents = new_parents)
+      }
+    }
+    return(cluster[!sapply(cluster, is.null)])
+  }
+  
+  all_pts <- lapply(pts, generate_cluster)
+  
+  times <- unlist(lapply(unlist(clusters, recursive = FALSE), `[[`, "times"))
+  parents <- unlist(lapply(unlist(clusters, recursive = FALSE), `[[`, "parents"))
+}
+
+sim_arma <- function(mu, theta, phi, bounds) {
+  stage_1 <- sim_hop(bounds, rate = mu)
+  stage_2 <- sim_cluster_poisson(intervention_points = stage_1,
+                                 bounds = bounds, kernel = theta)
+  stage_3 <- sim_gw(stage_2, rkernel = phi)
 }
