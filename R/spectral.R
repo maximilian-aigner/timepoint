@@ -1,14 +1,17 @@
-cov.brill <- function(eventlist, bw, debias = TRUE, plot = TRUE, ...) {
+cov.brill <- function(eventlist, lag.max = NULL, bw = NULL, debias = TRUE,
+                      plot = TRUE, ...) {
   obs <- eventlist$num_times
   bT <- eventlist$num_bounds[2]
+  if (is.null(lag.max)) lag.max <- bT
   if (is.null(bw)) bw <- bT / 100
-  u <- seq(0-bw, bT+bw, by=bw)
+  u <- seq(0-bw/2, lag.max+bw/2, by=bw)
   iat <- diff(eventlist$num_times)
-  iat.hist <- hist(iat[iat < bT], breaks = u, plot = FALSE)
+  iat.hist <- hist(iat[iat < lag.max], breaks = u, plot = FALSE)
   lambdabar <- length(eventlist) / bT
-  emp.cov <- iat.hist$counts / (bw * bT) - lambdabar^2# bT#/ length(obs)
+  emp.cov <- iat.hist$counts / (bw * bT)  - lambdabar^2 / bT# bT#/ length(obs)
+  #emp.cov[1] <- emp.cov[1] - lambdabar^2
   if (debias) {
-    emp.cov <- emp.cov + u[-length(u)] * length(obs)^2/bT^3
+    emp.cov <- emp.cov + u[-length(u)] * lambdabar^2 / bT
   }
   if (plot) {
     plot(iat.hist$mids, emp.cov, type = 'l', ...)
