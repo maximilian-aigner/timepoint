@@ -11,6 +11,7 @@ new_eventlist_from_dt <- function(datetimes, values = NULL,
     warning("No bounds provided, using data range")
     bounds <- range(datetimes)
   }
+  units_auto_selected <- units == "auto"
   
   stopifnot(is.POSIXt(datetimes))
   dts <- difftime(time1 = datetimes,
@@ -23,13 +24,15 @@ new_eventlist_from_dt <- function(datetimes, values = NULL,
                       "days", "weeks")
   
   # Reduce numtimes for numerical stability (...)
-  while(any(as.numeric(dts) > 1000)) {
-    if (units != "weeks") { # Otherwise, cannot increase
-      new_units <- possible_units[which(units == possible_units) + 1]
-      units(dts) <- new_units
-      units <- new_units
-    } else {
-      break
+  if (units_auto_selected) {
+    while(any(as.numeric(dts) > 1000)) {
+      if (units != "weeks") { # Otherwise, cannot increase
+        new_units <- possible_units[which(units == possible_units) + 1]
+        units(dts) <- new_units
+        units <- new_units
+      } else {
+        break
+     }
     }
   }
   
