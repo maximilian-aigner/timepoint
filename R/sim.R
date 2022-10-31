@@ -69,8 +69,9 @@ sim_dsp <- function(bounds = c(0, 10),
                          kernel = exp_kernel,
                          kernel_bound = NULL) {
   latent_pts <- sim_hop(bounds, rate)
-  obs_pts <- sim_cluster_poisson(latent_pts, kernel = kernel, bounds = bounds, kernel_bound)
-  return(list(latent = latent_pts, observed = obs_pts))
+  obs_pts <- sim_cluster_poisson(latent_pts, kernel = kernel, bounds = bounds,
+                                 kernel_bound)
+  return(list(latent = latent_pts, observed = obs_pts$observed))
 }
 
 sim_ihop <- function(lambda, bounds) {
@@ -78,8 +79,8 @@ sim_ihop <- function(lambda, bounds) {
   .thinning.alg(lambda, ub, bounds[2], ap = FALSE)
 }
 
-sim_gw <- function(pts, rkernel) {
-  
+sim_gw <- function(pts, rkernel,bounds) {
+  end<-bounds[2]
   generate_cluster = function(origin, max.generations = 100) {
     cluster = vector("list", max.generations)
     cluster[[1]] = list(times = origin, parents = 0)
@@ -114,15 +115,23 @@ sim_gw <- function(pts, rkernel) {
     return(cluster[!sapply(cluster, is.null)])
   }
   
-  all_pts <- lapply(pts, generate_cluster)
+  clusters <- lapply(pts, generate_cluster)
   
   times <- unlist(lapply(unlist(clusters, recursive = FALSE), `[[`, "times"))
   parents <- unlist(lapply(unlist(clusters, recursive = FALSE), `[[`, "parents"))
+  return(list(times=times,parents=parents))
 }
 
 sim_arma <- function(mu, theta, phi, bounds) {
   stage_1 <- sim_hop(bounds, rate = mu)
   stage_2 <- sim_cluster_poisson(intervention_points = stage_1,
                                  bounds = bounds, kernel = theta)
-  stage_3 <- sim_gw(stage_2, rkernel = phi)
+  stage_3 <- sim_gw(stage_2$observed, rkernel = phi, bounds = bounds)
+  return(list(immigr = stage_1, ma = stage_2, ar = stage_3))
+}
+
+sim_hawkes <- function(eta, phi, bounds) {
+  bg <- sim_hop(bounds, rate = eta)
+  excited <- sim_gw(pts = bg, rkernel = phi, bounds = bounds)
+  return(list(bg=bg,excited=excited$times))
 }
