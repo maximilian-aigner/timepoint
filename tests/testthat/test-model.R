@@ -10,7 +10,7 @@ origin <- ymd_hms("2022-01-01 00:00:00")
 end <- origin + seconds(100 * 24 * 60 * 60)
 datetimes <- origin + seconds(times*24*60*60)
 
-el <- eventlist(datetimes, bounds = c(origin, end))
+el <- eventlist(datetimes, bounds = c(origin, end), units = "hours")
 
 cova <- list(\(x) rep(1, length(x)))#, \(x) x / 1000)
 
