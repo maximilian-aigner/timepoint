@@ -1,4 +1,4 @@
-tpmodel <- function(cif, mdens, data, ilink = identity,
+tpmodel <- function(cif, data, ilink = identity,
                     do.fit = TRUE, num_integral = TRUE,
                     ...) {
   stopifnot("eventlist" %in% class(data))
@@ -15,10 +15,11 @@ tpmodel <- function(cif, mdens, data, ilink = identity,
       data$num_times,
       data$values,
       data$num_bounds[2],
-      cif
+      cif,
+      par
     )
     
-    out <- stats::optim(0, fn = nll, ...)
+    out <- stats::optim(rep(0, pardim), fn = nll, ...)
   }
   else
     out <- NULL
